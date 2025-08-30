@@ -17,16 +17,15 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if we have a token on app load
     const initAuth = () => {
       const storedToken = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
-      
+
       if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
-        // Set axios default headers
-        axios.defaults.headers.common['x-auth-token'] = storedToken;
+        // FIX: Use Authorization header
+        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
       }
       setLoading(false);
     };
@@ -36,32 +35,32 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://library-management-system-9v79.onrender.com/api' 
-        : 'http://localhost:5000/api';
+      const API_BASE_URL =
+        process.env.NODE_ENV === 'production'
+          ? 'https://library-management-system-9v79.onrender.com/api'
+          : 'http://localhost:5000/api';
 
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, 
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/login`,
         { email, password },
         {
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
-      
+
       const { token: newToken, user: userData } = response.data;
-      
+
       // Store in localStorage
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(userData));
-      
+
       // Update state
       setToken(newToken);
       setUser(userData);
-      
-      // Set axios default headers
-      axios.defaults.headers.common['x-auth-token'] = newToken;
-      
+
+      // FIX: Use Authorization header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
       return true;
     } catch (error) {
       console.error('Login failed:', error);
@@ -74,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
-    delete axios.defaults.headers.common['x-auth-token'];
+    delete axios.defaults.headers.common['Authorization'];
   };
 
   const value = {
@@ -82,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     logout,
-    loading
+    loading,
   };
 
   return (
