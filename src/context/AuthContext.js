@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://your-production-domain.com/api' 
+        ? 'https://library-management-system-9v79.onrender.com/api' 
         : 'http://localhost:5000/api';
 
       const response = await axios.post(`${API_BASE_URL}/auth/login`, 
